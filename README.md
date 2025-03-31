@@ -27,8 +27,8 @@ ETHlink8ADC is an open-source, open-hardware 8-input Ethernet audio interface, r
     - Clip at +6dBv
     - -136dbFS noise floor at 0db  
   - High current phantom power selectable for channel 1-4 5-8
-- **Flexible Power Options**: PoE-powered or 5V-15V DC jack (<1A).
-- **Optimized for Efficiency**: Rail-to-rail power supply, dual 3.3V LDO regulators for analog and digital rails, improving efficiency and reducing noise.
+- **Flexible Power Options**: PoE-powered or 12V-15V DC jack (<1A).
+- **Optimized for Efficiency**: Rail-to-rail power supply, dual 3.3V LDO regulators for analog and digital rails, improving efficiency and reducing noise, phantom power made from input voltage with LT8330 boost converter
 - **Compact Design**: Everything fits on a dual-layer 120x90 mm PCB.
 
 ## Hardware
@@ -54,7 +54,7 @@ The PCB is cost-optimized with a simplified architecture to improve manufacturab
 
 ### Example Application Device
 
-[View Example](https://github.com/emna8388/ETHlink8DAC/tree/main/snapshot_device_example)
+[View Example](https://github.com/eman8388/ETHlink8ADC/blob/main/snapshot_device_example/Image%202025-03-31%20at%2012.25.09.jpeg)
 
 ## Firmware
 
@@ -62,8 +62,8 @@ Developed in **C** using **STM32IDE**, based on **FreeRTOS**.
 
 - **Supported MCUs:** STM32H743VIT6 or the cost-effective STM32H750VBT6 (128KB ROM, requires project regeneration).
 - **MAC Address Assignment:**
-  - `00:E8:DA:C0:00:00` → Serial number 0
-  - `00:E8:DA:C0:00:01` → Serial number 1
+  - `00:E8:AD:C0:00:00` → Serial number 0
+  - `00:E8:AD:C0:00:01` → Serial number 1
   - The last two bytes of the MAC address represent the device's serial number (16-bit value).
 
 ### Communication Protocol
@@ -72,12 +72,10 @@ ETHlink8DAC communicates with the computer using **Raw Ethernet Frames (Layer-2)
 
 - The device receives a packet containing:
   - **64-byte header** (containing commands)
-  - **Audio data** (TDM format, 32-bit PCM, 8 channels, 8 samples per channel)
 - The device:
   1. Processes the command.
-  2. Sends audio data to a dynamic queue for playback via the TDM interface.
-  3. Sends a response packet once per second containing only the 64-byte header to the sender.
-  4. If no packet is received within one second, communication stops.
+  2. Sends audio data recorded via the TDM interface.
+  3. If no command packet is received within one second, communication stops.
 
 **Packet Structure:**
 
@@ -85,21 +83,16 @@ ETHlink8DAC communicates with the computer using **Raw Ethernet Frames (Layer-2)
 [ETHERNET LAYER 2 HEADER (14 BYTES)] - [APPLICATION HEADER (50 BYTES)] - [AUDIO DATA (8 CHANNELS × 8 SAMPLES × 4 BYTES PER SAMPLE)]
 ```
 
-
 For details, refer to **main.c** and **ethernetif.c**.
-
-### Known Firmware Issues
-
-- Audio samples must be transmitted every **8/FS**, which is **<<1ms**. To accommodate this, the **FreeRTOS scheduler must be set to at least 10,000 ticks per second**, which might cause system instability. However, in this specific application, it functions reliably.
 
 ## Flashing Instructions
 
-1. **Download and extract** `ETH8DAC_STM32IDE_FILES.zip`.
-2. **Open STM32IDE** and create a new project using `ETH8DAC.ioc` configuration.
-3. **Replace project files** with those from the `ETH8DAC_STM32IDE_FILES` folder.
+1. **Download and extract** `ETH8ADC_STM32IDE_FILES.zip`.
+2. **Open STM32IDE** and create a new project using `ETH8ADC.ioc` configuration.
+3. **Replace project files** with those from the `ETH8ADC_STM32IDE_FILES` folder.
 4. **Modify MAC Address**:
    - Open `ethernetif.c` (under `LWIP->TARGET`).
-   - Locate `static void low_level_init(struct netif *netif);` (line 219).
+   - Locate `static void low_level_init(struct netif *netif);`.
    - Update the `MACAddr[]` array with your desired address.
 5. **Optimize the build**:
    - Right-click on the project → Properties → `C/C++ Build` → Settings → `MCU/MPU GCC Compiler` → Optimization → Set to `-Ofast`.
