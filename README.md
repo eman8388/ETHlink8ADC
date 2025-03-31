@@ -52,9 +52,9 @@ The PCB is cost-optimized with a simplified architecture to improve manufacturab
 - Depending on the PCB layout, TDM signals (BCK, FS, DATA\_OUT) may require impedance compensation. In my case, i don't have to add anything (R150 R151 R152 not populated).
 - The resistor values for the status LED (R148, R149) may need to be adjusted based on the LED type.
 
-### Example Application Device
+### Protorype Application Device
 
-[View Example](https://github.com/eman8388/ETHlink8ADC/blob/main/snapshot_device_example/Image%202025-03-31%20at%2012.25.09.jpeg)
+![View Example](https://github.com/eman8388/ETHlink8ADC/blob/main/snapshot_device_example/Image%202025-03-31%20at%2012.25.09.jpeg)
 
 ## Firmware
 
